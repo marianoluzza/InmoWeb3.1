@@ -20,5 +20,16 @@ namespace InmoWeb3._1.Extra
 			}
 			return res;
 		}
+		public static int MiId([NotNull] this IIdentity source)
+		{
+			int res = 0;
+			if (source is ClaimsIdentity)
+			{
+				var r = (source as ClaimsIdentity).Claims.FirstOrDefault<Claim>(x => x.Type.ToLower() == "id")?.Value;
+				int.TryParse(r, out res);
+			}
+			return res;
+		}
+
 	}
 }

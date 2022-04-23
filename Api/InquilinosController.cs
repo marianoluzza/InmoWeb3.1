@@ -49,7 +49,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -68,7 +68,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -85,7 +85,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -102,7 +102,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -118,11 +118,11 @@ namespace InmoWeb3._1.Controllers
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
     }

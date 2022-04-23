@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InmoWeb3._1.Models
 {
+	[Table("grupos")]
 	public class Grupo
 	{
 		public int Id { get; set; }

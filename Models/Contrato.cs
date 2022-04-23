@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InmoWeb3._1.Models
 {
+	[Table("contratos")]
 	public class Contrato : EntidadBase
 	{
 		public DateTime Desde { get; set; }

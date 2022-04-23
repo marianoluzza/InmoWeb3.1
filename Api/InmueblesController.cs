@@ -3,6 +3,7 @@ using InmoWeb3._1.Extra;
 using InmoWeb3._1.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,21 +28,22 @@ namespace InmoWeb3._1.Controllers
 		private readonly ILogger<InmueblesController> _logger;
 		private readonly DataContext _context;
         private readonly IConfiguration config;
-        private readonly int miGrupo;
+        private readonly int miGrupo, miId;
         private readonly string identidad;
 
-        public InmueblesController(ILogger<InmueblesController> logger, DataContext context, IConfiguration config)
+        public InmueblesController(ILogger<InmueblesController> logger, DataContext context, IConfiguration config, IHttpContextAccessor contextAccessor)
 		{
 			_logger = logger;
 			_context = context;
             this.config = config;
-            miGrupo = User.Identity.Grupo();
-            identidad = User.Identity.Name;
+            miGrupo = contextAccessor.HttpContext.User.Identity.Grupo();
+            miId = contextAccessor.HttpContext.User.Identity.MiId();
+            identidad = contextAccessor.HttpContext.User.Identity.Name;
         }
 
         // GET: api/<controller>
         [Authorize(Policy = "Admin")]
-        [HttpGet("{grupo}")]
+        [HttpGet("g/{grupo}")]
         public async Task<IActionResult> GetByGrupo(int grupo)
         {
             try
@@ -51,12 +53,27 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
+            }
+        }
+
+        // GET: api/<controller>
+        [HttpGet("{id:int:max(0)}")]
+        public async Task<IActionResult> GetAll(int id)
+        {
+            try
+            {
+                var res = await _context.Inmuebles.Where(e => e.PropietarioId == miId).ToListAsync();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new Exc(ex));
             }
         }
 
         // GET api/<controller>/5
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int:min(1)}")]
         public async Task<IActionResult> Get(int id)
         {
             try
@@ -72,7 +89,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -82,18 +99,15 @@ namespace InmoWeb3._1.Controllers
         {
             try
             {
-                if (_context.Inmuebles.AsNoTracking().Include(e => e.Propietario)
-                    .FirstOrDefault(e => e.Id == entidad.Id && e.GrupoId == miGrupo && e.Propietario.Email == identidad) != null)
-                {
-                    _context.Inmuebles.Add(entidad);
-                    await _context.SaveChangesAsync();
-                    return CreatedAtAction(nameof(Get), new { id = entidad.Id }, entidad);
-                }
-                else return BadRequest();
+                entidad.PropietarioId = miId;
+                entidad.GrupoId = miGrupo;
+                _context.Inmuebles.Add(entidad);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(Get), new { id = entidad.Id }, entidad);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -103,8 +117,9 @@ namespace InmoWeb3._1.Controllers
         {
             try
             {
-                if (_context.Inmuebles.AsNoTracking().Include(e => e.Propietario)
-                    .FirstOrDefault(e => e.Id == entidad.Id && e.GrupoId == miGrupo && e.Propietario.Email == identidad) != null)
+                entidad.Id = id;
+                if (_context.Inmuebles.AsNoTracking()
+                    .FirstOrDefault(e => e.Id == entidad.Id && e.GrupoId == miGrupo && e.PropietarioId == miId) != null)
                 {
                     _context.Inmuebles.Update(entidad);
                     await _context.SaveChangesAsync();
@@ -114,7 +129,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -124,8 +139,8 @@ namespace InmoWeb3._1.Controllers
         {
             try
             {
-                if (_context.Inmuebles.AsNoTracking().Include(e => e.Propietario)
-                    .FirstOrDefault(e => e.Id == id && e.GrupoId == miGrupo && e.Propietario.Email == identidad) != null)
+                if (_context.Inmuebles.AsNoTracking()
+                    .FirstOrDefault(e => e.Id == id && e.GrupoId == miGrupo && e.PropietarioId == miId) != null)
                 {
                     _context.Inmuebles.Remove(new Inmueble { Id = id });
                     await _context.SaveChangesAsync();
@@ -135,11 +150,11 @@ namespace InmoWeb3._1.Controllers
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
     }

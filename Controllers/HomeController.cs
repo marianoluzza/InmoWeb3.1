@@ -1,5 +1,7 @@
-﻿using InmoWeb3._1.Models;
+﻿using Inmobiliaria_.Net_Core.Models;
+using InmoWeb3._1.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,12 @@ namespace InmoWeb3._1.Controllers
 	public class HomeController : Controller
 	{
 		private readonly ILogger<HomeController> _logger;
+		private readonly DataContext context;
 
-		public HomeController(ILogger<HomeController> logger)
+		public HomeController(ILogger<HomeController> logger, DataContext context)
 		{
 			_logger = logger;
+			this.context = context;
 		}
 
 		public IActionResult Index()
@@ -27,6 +31,12 @@ namespace InmoWeb3._1.Controllers
 		public IActionResult Privacy()
 		{
 			return View();
+		}
+
+		public async Task<IActionResult> Grupos()
+		{
+			var lista = await context.Grupos.ToListAsync();
+			return View(lista);
 		}
 
 		public IActionResult Generar()

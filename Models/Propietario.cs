@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InmoWeb3._1.Models
 {
+	[Table("propietarios")]
 	public class Propietario : EntidadBase
 	{
 		public string Nombre { get; set; }

@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InmoWeb3._1.Models
 {
+	[Table("inmuebles")]
 	public class Inmueble : EntidadBase
 	{
 		public string Direccion { get; set; }

@@ -2,6 +2,7 @@ using Inmobiliaria_.Net_Core.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,15 +48,33 @@ namespace InmoWeb3._1
 				options.AddPolicy("Admin", policy => policy.RequireRole("SuperAdministrador"));
 			});
 			services.AddControllersWithViews();
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			//services.AddNewtonsoftJson(x =>
+			//				x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 			/* PARA MySql - usando Pomelo */
 			services.AddDbContext<DataContext>(
 				options => options.UseMySql(Configuration["ConnectionStrings:DefaultConnection"])
+				//options => options.UseMySql(Configuration["ConnectionStrings:Local"])
 			);
+			services.AddCors(options =>
+			{
+				options.AddPolicy("CorsPolicy",
+					builder => builder
+						.AllowAnyMethod()
+						.AllowAnyHeader()
+						.AllowCredentials()
+						//.AllowAnyOrigin()
+						.SetIsOriginAllowed((host) => true) //allow all connections (including Signalr)
+					);
+			});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
+			app.UseCors("CorsPolicy");
+			app.UseDeveloperExceptionPage();
+			/*
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
@@ -63,7 +82,7 @@ namespace InmoWeb3._1
 			else
 			{
 				app.UseExceptionHandler("/Home/Error");
-			}
+			}*/
 			app.UseStaticFiles();
 
 			app.UseRouting();

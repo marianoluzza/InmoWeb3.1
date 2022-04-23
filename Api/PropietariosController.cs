@@ -52,7 +52,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -71,7 +71,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -90,7 +90,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -109,7 +109,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -141,7 +141,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
@@ -162,18 +162,18 @@ namespace InmoWeb3._1.Controllers
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 
         // POST api/<controller>/login
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromForm] LoginView loginView)
+        public async Task<IActionResult> Login([FromBody] LoginView loginView)
         {
             try
             {
@@ -192,6 +192,7 @@ namespace InmoWeb3._1.Controllers
                     {
                         new Claim(ClaimTypes.Name, p.Email),
                         new Claim("Nombre", p.Nombre),
+                        new Claim("Id", p.Id.ToString()),
                         new Claim("Grupo", p.GrupoId.ToString()),
                         new Claim(ClaimTypes.Role, "Propietario"),
                     };
@@ -208,7 +209,7 @@ namespace InmoWeb3._1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new Exc(ex));
             }
         }
 

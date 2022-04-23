@@ -3,6 +3,7 @@ using InmoWeb3._1.Extra;
 using InmoWeb3._1.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,16 +28,17 @@ namespace InmoWeb3._1.Controllers
 		private readonly ILogger<PagosController> _logger;
 		private readonly DataContext _context;
         private readonly IConfiguration config;
-        private readonly int miGrupo;
+        private readonly int miGrupo, miId;
         private readonly string identidad;
 
-        public PagosController(ILogger<PagosController> logger, DataContext context, IConfiguration config)
-		{
-			_logger = logger;
-			_context = context;
+        public PagosController(ILogger<PagosController> logger, DataContext context, IConfiguration config, IHttpContextAccessor contextAccessor)
+        {
+            _logger = logger;
+            _context = context;
             this.config = config;
-            miGrupo = User.Identity.Grupo();
-            identidad = User.Identity.Name;
+            miGrupo = contextAccessor.HttpContext.User.Identity.Grupo();
+            miId = contextAccessor.HttpContext.User.Identity.MiId();
+            identidad = contextAccessor.HttpContext.User.Identity.Name;
         }
 
 
